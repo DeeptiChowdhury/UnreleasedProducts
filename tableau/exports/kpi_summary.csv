@@ -1,0 +1,2 @@
+total_products,total_estimated_revenue,total_units_sold_est,avg_rating,avg_discount_pct,avg_selling_price,top_revenue_category,num_main_categories,num_sub_categories,corr_price_vs_sales,corr_discount_vs_sales,corr_rating_vs_sales,best_model,best_model_r2,best_model_mae
+19680,203632906576.0,45821726,3.9889329268292673,22.57719461382114,5750.615853658536,mobiles,20,72,-0.119,0.182,0.503,XGBoost,0.687,667.2

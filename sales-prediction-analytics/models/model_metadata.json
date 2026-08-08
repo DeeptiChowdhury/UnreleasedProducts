@@ -1,0 +1,185 @@
+{
+  "model_name": "XGBoost",
+  "feature_columns": [
+    "product_description",
+    "main_category",
+    "sub_category",
+    "discount_price",
+    "actual_price",
+    "ratings",
+    "discount_percentage"
+  ],
+  "target_col": "total_sales",
+  "target_transform": "log1p",
+  "main_categories": [
+    "appliances",
+    "beauty & health",
+    "books",
+    "car & motorbike",
+    "computers",
+    "electronics",
+    "fashion",
+    "garden & outdoors",
+    "grocery & gourmet foods",
+    "home & kitchen",
+    "home improvement",
+    "industrial & scientific",
+    "luggage & bags",
+    "mobiles",
+    "music & instruments",
+    "office products",
+    "pet supplies",
+    "sports & fitness",
+    "toys & baby products",
+    "watches"
+  ],
+  "sub_categories_by_main": {
+    "toys & baby products": [
+      "baby care",
+      "educational games",
+      "infant wear",
+      "toys"
+    ],
+    "luggage & bags": [
+      "backpacks",
+      "suitcases",
+      "wallets"
+    ],
+    "electronics": [
+      "cameras",
+      "headphones",
+      "smart watches",
+      "speakers",
+      "televisions"
+    ],
+    "beauty & health": [
+      "haircare",
+      "makeup",
+      "personal care appliances",
+      "skincare"
+    ],
+    "fashion": [
+      "footwear",
+      "men's clothing",
+      "watches",
+      "women's clothing"
+    ],
+    "home & kitchen": [
+      "cookware",
+      "furniture",
+      "home decor",
+      "kitchen storage"
+    ],
+    "sports & fitness": [
+      "cycling",
+      "gym equipment",
+      "sportswear",
+      "yoga"
+    ],
+    "mobiles": [
+      "cases & covers",
+      "mobile accessories",
+      "power banks",
+      "smartphones"
+    ],
+    "computers": [
+      "keyboards & mice",
+      "laptops",
+      "monitors",
+      "storage devices"
+    ],
+    "grocery & gourmet foods": [
+      "beverages",
+      "organic foods",
+      "snacks",
+      "staples"
+    ],
+    "car & motorbike": [
+      "bike accessories",
+      "car accessories",
+      "car care"
+    ],
+    "pet supplies": [
+      "pet accessories",
+      "pet food",
+      "pet grooming"
+    ],
+    "appliances": [
+      "air conditioners",
+      "microwaves",
+      "refrigerators",
+      "washing machines"
+    ],
+    "books": [
+      "academic",
+      "children's books",
+      "fiction",
+      "non-fiction"
+    ],
+    "watches": [
+      "analog watches",
+      "smart watches",
+      "watch accessories"
+    ],
+    "office products": [
+      "office electronics",
+      "stationery",
+      "storage & organization"
+    ],
+    "home improvement": [
+      "electricals",
+      "hand tools",
+      "paint supplies",
+      "power tools"
+    ],
+    "garden & outdoors": [
+      "gardening tools",
+      "grills",
+      "outdoor furniture"
+    ],
+    "music & instruments": [
+      "accessories",
+      "guitars",
+      "keyboards"
+    ],
+    "industrial & scientific": [
+      "lab equipment",
+      "measuring tools",
+      "safety gear"
+    ]
+  },
+  "price_stats": {
+    "actual_price": {
+      "min": 49.0,
+      "max": 149994.0,
+      "median": 1700.0
+    }
+  },
+  "training_rows": 9840,
+  "metrics": [
+    {
+      "model": "XGBoost",
+      "MAE": 667.2226699348388,
+      "MSE": 1055633.6138085406,
+      "RMSE": 1027.4403212880738,
+      "R2": 0.6868670535792102,
+      "train_time_sec": 21.23
+    },
+    {
+      "model": "GradientBoosting",
+      "MAE": 684.3807712433944,
+      "MSE": 1125773.9124482842,
+      "RMSE": 1061.0249348852667,
+      "R2": 0.6660613137007143,
+      "train_time_sec": 41.71
+    },
+    {
+      "model": "RandomForest",
+      "MAE": 761.1701752313766,
+      "MSE": 1358706.2324574888,
+      "RMSE": 1165.6355487275982,
+      "R2": 0.5969665229257577,
+      "train_time_sec": 227.78
+    }
+  ]
+}

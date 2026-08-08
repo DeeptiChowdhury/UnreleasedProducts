@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Sales Predictor</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>📦 New Product Sales Predictor</h1>
+    <p class="subtitle">Estimate demand for a new product before you launch it —
+      powered by <strong>{{ model_name }}</strong>
+      (R² = {{ '%.2f'|format(best_metrics.R2) }}, MAE = {{ '%.0f'|format(best_metrics.MAE) }} units on held-out data)</p>
+    <nav><a href="{{ url_for('dashboard') }}">View analytics summary →</a></nav>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Product details</h2>
+      <form method="POST" action="{{ url_for('predict') }}">
+        <label for="description">Product name / description</label>
+        <input type="text" id="description" name="description" placeholder="e.g. Bose Wireless Headphones Pro 400"
+               value="{{ form_values.description if form_values else '' }}">
+
+        <div class="row">
+          <div>
+            <label for="main_category">Main category</label>
+            <select id="main_category" name="main_category" required>
+              <option value="" disabled {{ 'selected' if not form_values }}>Select…</option>
+              {% for cat in main_categories %}
+              <option value="{{ cat }}" {{ 'selected' if form_values and form_values.main_category==cat }}>{{ cat|title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="sub_category">Sub-category</label>
+            <select id="sub_category" name="sub_category" required>
+              <option value="" disabled selected>Select a main category first…</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="actual_price">Actual (list) price (₹)</label>
+            <input type="number" step="0.01" id="actual_price" name="actual_price" required min="1"
+                   value="{{ form_values.actual_price if form_values else '' }}">
+          </div>
+          <div>
+            <label for="discount_price">Selling (discount) price (₹)</label>
+            <input type="number" step="0.01" id="discount_price" name="discount_price" min="0"
+                   value="{{ form_values.discount_price if form_values else '' }}">
+          </div>
+        </div>
+
+        <label for="rating">Expected / target customer rating (1–5)</label>
+        <input type="range" id="rating" name="rating" min="1" max="5" step="0.1"
+               value="{{ form_values.rating if form_values else 4.0 }}"
+               oninput="document.getElementById('ratingVal').innerText = this.value">
+        <div class="rating-value">★ <span id="ratingVal">{{ form_values.rating if form_values else 4.0 }}</span></div>
+
+        <button type="submit">Predict sales</button>
+      </form>
+      {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    </section>
+
+    <section class="card result-card">
+      <h2>Prediction</h2>
+      {% if result %}
+        <div class="metric-big">{{ "{:,}".format(result.predicted_sales) }}</div>
+        <div class="metric-label">estimated units sold</div>
+
+        <div class="stat-list">
+          <div class="stat"><span>Estimated revenue</span><strong>₹{{ "{:,.0f}".format(result.estimated_revenue) }}</strong></div>
+          <div class="stat"><span>Discount applied</span><strong>{{ result.discount_percentage }}%</strong></div>
+          <div class="stat"><span>Model used</span><strong>{{ result.model_name }}</strong></div>
+        </div>
+
+        {% if result.benchmark %}
+        <h3>vs. category benchmark</h3>
+        <div class="stat-list">
+          <div class="stat"><span>Category avg. price</span><strong>₹{{ "{:,.0f}".format(result.benchmark.category_avg_price) }}</strong></div>
+          <div class="stat"><span>Your price is</span>
+            <strong class="{{ 'pos' if result.benchmark.price_delta_pct < 0 else 'neg' }}">
+              {{ "%+.1f"|format(result.benchmark.price_delta_pct) }}% vs. category avg
+            </strong>
+          </div>
+          <div class="stat"><span>Predicted sales vs. category avg</span>
+            <strong class="{{ 'pos' if result.benchmark.sales_delta_pct > 0 else 'neg' }}">
+              {{ "%+.1f"|format(result.benchmark.sales_delta_pct) }}%
+            </strong>
+          </div>
+        </div>
+        {% endif %}
+
+        <p class="disclaimer">This is a statistical estimate based on historical patterns for similar
+          products, prices, and ratings — not a guarantee. Use it to compare pricing/positioning
+          scenarios, not as a single source of truth.</p>
+      {% else %}
+        <p class="placeholder">Fill in the product details and click <strong>Predict sales</strong> to see
+          an estimate here.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <footer>
+    <p>Sales Prediction &amp; Business Analytics project · Flask + scikit-learn + XGBoost ·
+      <a href="https://github.com/" target="_blank" rel="noopener">View on GitHub</a></p>
+  </footer>
+</div>
+
+<script>
+const subsByMain = {{ sub_categories_by_main | tojson }};
+const mainSelect = document.getElementById('main_category');
+const subSelect = document.getElementById('sub_category');
+const presetSub = {{ (form_values.sub_category if form_values else '') | default('', true) | tojson }};
+
+function populateSubs() {
+  const chosen = mainSelect.value;
+  const subs = subsByMain[chosen] || [];
+  subSelect.innerHTML = '';
+  if (!subs.length) {
+    const opt = document.createElement('option');
+    opt.textContent = 'No sub-categories found';
+    subSelect.appendChild(opt);
+    return;
+  }
+  subs.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+    if (s === presetSub) opt.selected = true;
+    subSelect.appendChild(opt);
+  });
+}
+mainSelect.addEventListener('change', populateSubs);
+if (mainSelect.value) populateSubs();
+</script>
+</body>
+</html>

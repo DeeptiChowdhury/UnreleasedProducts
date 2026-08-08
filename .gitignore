@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Data (large / generated)
+# Keep the bundled sample dataset + cleaned output out of git noise, but the
+# sample raw CSV IS committed (see the "!" rule below) so the repo works
+# immediately after a fresh clone without needing to generate anything.
+data/raw/amazon_categories/
+data/processed/*.csv
+!data/processed/.gitkeep
+
+# Models: the trained model IS committed (small, ~300KB) so the Flask app
+# and Tableau exports work immediately after cloning. Delete + retrain
+# any time with `python -m src.train`.
+
+# Tableau exports ARE committed too, for the same reason -- open Tableau
+# and point it at tableau/exports/ right after cloning, no pipeline run
+# required. Regenerate with `python -m src.business_analytics`.
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Flask
+instance/
+.flaskenv

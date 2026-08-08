@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics Summary</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>📊 Analytics summary</h1>
+    <p class="subtitle">A quick sanity-check view. For the full interactive dashboard,
+      open the exports in <code>tableau/exports/</code> with Tableau —
+      see <code>tableau/README.md</code>.</p>
+    <nav><a href="{{ url_for('index') }}">← Back to predictor</a></nav>
+  </header>
+
+  {% if not ready %}
+  <section class="card">
+    <p>No analytics exports found yet. Run:</p>
+    <pre>python -m src.train
+python -m src.business_analytics</pre>
+    <p>then refresh this page.</p>
+  </section>
+  {% else %}
+  <section class="kpi-grid">
+    <div class="kpi"><span>{{ "{:,}".format(kpis.total_products|int) }}</span><label>Products</label></div>
+    <div class="kpi"><span>₹{{ "{:,.0f}".format(kpis.total_estimated_revenue) }}</span><label>Est. revenue</label></div>
+    <div class="kpi"><span>{{ "{:,}".format(kpis.total_units_sold_est|int) }}</span><label>Units sold (est.)</label></div>
+    <div class="kpi"><span>{{ "%.2f"|format(kpis.avg_rating) }} ★</span><label>Avg rating</label></div>
+    <div class="kpi"><span>{{ "%.1f"|format(kpis.avg_discount_pct) }}%</span><label>Avg discount</label></div>
+    <div class="kpi"><span>{{ kpis.best_model }}</span><label>Best model (R²={{ "%.2f"|format(kpis.best_model_r2) }})</label></div>
+  </section>
+
+  <section class="card">
+    <h2>Revenue by category</h2>
+    <canvas id="catChart" height="110"></canvas>
+  </section>
+
+  <section class="card">
+    <h2>Correlations with sales volume</h2>
+    <div class="stat-list">
+      <div class="stat"><span>Price vs. sales</span><strong>{{ kpis.corr_price_vs_sales }}</strong></div>
+      <div class="stat"><span>Discount % vs. sales</span><strong>{{ kpis.corr_discount_vs_sales }}</strong></div>
+      <div class="stat"><span>Rating vs. sales</span><strong>{{ kpis.corr_rating_vs_sales }}</strong></div>
+    </div>
+  </section>
+  {% endif %}
+
+  <footer>
+    <p>Sales Prediction &amp; Business Analytics project</p>
+  </footer>
+</div>
+
+{% if ready %}
+<script>
+new Chart(document.getElementById('catChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ chart_labels | tojson }},
+    datasets: [{
+      label: 'Estimated revenue (₹)',
+      data: {{ chart_values | tojson }},
+      backgroundColor: '#5b8def'
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+</script>
+{% endif %}
+</body>
+</html>
